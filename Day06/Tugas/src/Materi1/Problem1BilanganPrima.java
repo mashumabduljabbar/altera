@@ -1,3 +1,4 @@
+package Materi1;
 public class Problem1BilanganPrima {
 
 	public static void main(String[] args) {
