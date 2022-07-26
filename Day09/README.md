@@ -38,7 +38,7 @@ Server has startup warnings:
 
 ### Create
 #### a. insert 5 operators pada table operators
-```json
+```console
 > db.createCollection("operators")
 { "ok" : 1 }
 
@@ -62,7 +62,7 @@ BulkWriteResult({
 ```
 
 #### b. insert 3 product type
-```json
+```console
 > db.createCollection("product_types")
 { "ok" : 1 }
 
@@ -84,7 +84,7 @@ BulkWriteResult({
 ```
 
 #### c. insert 2 product dengan product type id = 1, dan operators id = 3
-```json
+```console
 > db.createCollection("products")
 { "ok" : 1 }
 
@@ -105,7 +105,7 @@ BulkWriteResult({
 ```
 
 #### d. insert 3 product dengan product type id = 2, dan operators id = 1
-```json
+```console
 > db.products.insertMany( [
 ... { id: 3, product_type_id: 2, operator_id: 1, code: "PLSTLK005", name: "Pulsa Telkomsel 5.000" },
 ... { id: 4, product_type_id: 2, operator_id: 1, code: "PLSTLK010", name: "Pulsa Telkomsel 10.000" },
@@ -124,7 +124,7 @@ BulkWriteResult({
 ```
 
 #### e. insert 3 product dengan product type id = 3, dan operators id = 4
-```json
+```console
 > db.products.insertMany( [
 ... { id: 6, product_type_id: 3, operator_id: 4, code: "INETAX1GB", name: "Paket Internet Axis 1GB" },
 ... { id: 7, product_type_id: 3, operator_id: 4, code: "INETAX2GB", name: "Paket Internet Axis 2GB" },
@@ -143,7 +143,7 @@ BulkWriteResult({
 ```
 
 #### f. insert product description pada setiap product
-```json
+```console
 > db.createCollection("product_description")
 { "ok" : 1 }
 
@@ -170,7 +170,7 @@ BulkWriteResult({
 ```
 
 #### g. insert 3 payment methods
-```json
+```console
 > db.createCollection("payment_methods")
 { "ok" : 1 }
 
@@ -193,7 +193,7 @@ BulkWriteResult({
 
 
 #### h. insert 5 user pada table user
-```json
+```console
 > db.createCollection("users")
 { "ok" : 1 }
 
@@ -217,7 +217,7 @@ BulkWriteResult({
 ```
 
 #### i. insert 3 transaksi di masing-masing user.
-```json
+```console
 > db.createCollection("transactions")
 { "ok" : 1 }
 
@@ -251,7 +251,7 @@ BulkWriteResult({
 ```
 
 #### j. insert 3 product di masing-masing transaksi.
-```json
+```console
 > db.createCollection("transaction_details")
 { "ok" : 1 }
 > db.transaction_details.insertMany( [
@@ -316,7 +316,7 @@ BulkWriteResult({
 
 ### Read
 #### a. Tampilkan nama user dengan gender Laki-Laki / M
-```json
+```console
 > db.users.find({gender: "M"})
 { "_id" : ObjectId("62dfc6e22798d62970d001f6"), "id" : 1, "name" : "Fajar", "address" : "Jakarta", "dob" : "1993-07-28", "status" : 1, "gender" : "M" }
 { "_id" : ObjectId("62dfc6e22798d62970d001f8"), "id" : 3, "name" : "Rizky", "address" : "Jakarta", "dob" : "1993-06-22", "status" : 1, "gender" : "M" }
@@ -324,19 +324,19 @@ BulkWriteResult({
 ```
 
 #### b. Tampilkan product dengan id = 3
-```json
+```console
 > db.products.find({id: 3})
 { "_id" : ObjectId("62dfbb5b2798d62970d001e5"), "id" : 3, "product_type_id" : 2, "operator_id" : 1, "code" : "PLSTLK005", "name" : "Pulsa Telkomsel 5.000" }
 ```
 
 #### c. Hitung jumlah user dengan gender Perempuan / F
-```json
+```console
 > db.users.count({gender: "F"})
 2
 ```
 
 #### d. Tampilkan data user dengan urutan sesuai nama abjad
-```json
+```console
 > db.users.find().sort( { "name": 1 } )
 { "_id" : ObjectId("62dfc6e22798d62970d001f6"), "id" : 1, "name" : "Fajar", "address" : "Jakarta", "dob" : "1993-07-28", "status" : 1, "gender" : "M" }
 { "_id" : ObjectId("62dfc6e22798d62970d001f9"), "id" : 4, "name" : "Jabbar", "address" : "Jakarta", "dob" : "1993-02-21", "status" : 1, "gender" : "M" }
@@ -346,7 +346,7 @@ BulkWriteResult({
 ```
 
 #### e. Tampilkan 5 data product
-```json
+```console
 > db.products.find().limit(5)
 { "_id" : ObjectId("62dfbb442798d62970d001e3"), "id" : 1, "product_type_id" : 1, "operator_id" : 3, "code" : "PRDN001", "name" : "Perdana Tri 100.000" }
 { "_id" : ObjectId("62dfbb442798d62970d001e4"), "id" : 2, "product_type_id" : 1, "operator_id" : 3, "code" : "PRDN002", "name" : "Perdana Tri 200.000" }
@@ -357,26 +357,26 @@ BulkWriteResult({
 
 ### Update
 #### a. Ubah data product id 1 dengan nama 'product dummy'
-```json
+```console
 > db.products.update({id: 1}, {"id" : 1, "product_type_id" : 1, "operator_id" : 3, "code" : "PRDN001", "name" : "product dummy"})
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
 
 #### b. Ubah qty = 3 pada transaction details dengan product id 1
-```json
+```console
 > db.transaction_details.update({product_id: "1"}, {$set: { "qty" : 3}}, {multi: true })
 WriteResult({ "nMatched" : 15, "nUpserted" : 0, "nModified" : 14 })
 ```
 
 ### Delete
 #### a. Delete data pada tabel product dengan id 1
-```json
+```console
 > db.products.remove({id: 1})
 WriteResult({ "nRemoved" : 1 })
 ```
 
 #### b. Delete pada data tabel product dengan product type id 1
-```json
+```console
 > db.products.remove({product_type_id: 1}, {multi: true })
 WriteResult({ "nRemoved" : 3 })
 ```
