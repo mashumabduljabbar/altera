@@ -1,4 +1,5 @@
 # Task: Introduction No SQL & Mongo DB 
+
 ## Problem 1 : Create, Read, Update and Delete
 
 ### Prepare :
@@ -380,3 +381,68 @@ WriteResult({ "nRemoved" : 1 })
 > db.products.remove({product_type_id: 1}, {multi: true })
 WriteResult({ "nRemoved" : 3 })
 ```
+
+************************************
+************************************
+************************************
+
+# Task: Mongo DB: Advanced Query, Array, Aggregation
+
+## Problem 2 : Aggregation MongoDB
+
+### Prepare :
+
+#### Books
+```console
+> db.books.insertMany([
+{_id : 1, title : "Wawasan Pancasila", authorID : 1, publisherID : 1, price : 71200, stats : {page : 324, weight : 300}, publishedAt : new Date("2018-10-01"), category : ["social", "politics"]},
+{_id : 2, title : "Mata Air Keteladanan", authorID : 1, publisherID : 2, price : 106250, stats : {page : 672, weight : 650}, publishedAt : new Date ("2017-09-01"), category : ["social", "politics"]},
+{_id : 3, title : "Revolusi Pancasila", authorID : 1, publisherID : 1, price : 54400, stats : {page : 220, weight : 500}, publishedAt : new Date("2015-05-01"), category : ["social", "politics"]},
+{_id : 4, title : "Self Driving", authorID : 2, publisherID : 1, price : 58650, stats : {page : 286, weight : 300}, publishedAt : new Date("2018-05-01"), category : ["self-development"]},
+{_id : 5, title : "Self Disruption", authorID : 2, publisherID : 2, price : 83300, stats : {page : 400, weight : 800}, publishedAt : new Date("2018-05-01"), category : ["self-development"]}
+])
+
+{
+  acknowledged: true,
+  insertedIds: { '0': 1, '1': 2, '2': 3, '3': 4, '4': 5 }
+}
+```
+
+#### Authors
+```console
+db.authors.insertMany([
+{_id : 1, firstName : "Yudi", lastName : "Latif"}, 
+{_id : 2, firstName : "Rhenald", lastName : "Kasali"} 
+])
+{ acknowledged: true, insertedIds: { '0': 1, '1': 2 } }
+```
+
+#### Publishers
+```console
+db.publishers.insertMany([
+{_id : 1, publisherName : "Expose"}, 
+{_id : 2, publisherName : "Mizan"} 
+])
+{ acknowledged: true, insertedIds: { '0': 1, '1': 2 } }
+```
+
+
+### Create
+#### 1. Tampilkan Gabungan data buku dari author id 1 dan author id 2.
+#### 2. Tampilkan daftar buku dan harga author id 1.
+#### 3. Tampilkan total jumlah halaman buku author id 2
+#### 4. Tampilkan semua field books and authors terkait
+#### 5. Tampilkan semua field books, authors dan publishers terkait
+#### 6. Tampilkan summary data authors, books dan publishers sesuai output
+#### 7. Digital_outlet ingin memberikan diskon untuk setiap buku, diskon ditentukan melihat harga buku tersebut dengan pembagian seperti ini.
+
+<table>
+<tr><td> Price < 60.000 </td><td> 1% </td></tr>
+<tr><td> 60.000 < Price < 90.000 </td><td> 2% </td></tr>
+<tr><td> 90.000 < Price </td><td> 3% </td></tr>
+</table>
+
+#### 8. Tampilkan semua nama buku, harga, nama author dan nama publisher, urutkan dari harga termahal ke termurah
+#### 9. Tampilkan data nama buku harga dan publisher, kemudian tampilkan hanya data ke 3 dan ke 4
+
+
