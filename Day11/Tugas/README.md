@@ -4,9 +4,9 @@
 
 ### Problem 1 - Say Hello from Springboot 
 Buatlah project Springboot yang dapat menampilkan pesan hello world dalam 3 endpoint berikut! 
-a. GET /v1/messages 
-b. POST /v1/messages 
-c. DELETE /v1/messages 
+* a. GET /v1/messages 
+* b. POST /v1/messages 
+* c. DELETE /v1/messages 
 
 ``` java
 package com.mashumabduljabbar.springboothelloworld;
@@ -41,12 +41,12 @@ Dari 3 endpoint tersebut, jelaskan masing-masing perbedaannya!
 
 #### GET
 Metode Get pada umumnya digunakan untuk read data baik keseluruhan ataupun data tertentu menggunakan parameter.
-<img src="Screenshots/get.png">
+<img src="screenshots/get.png">
 
 #### POST
 Metode Post pada umumnya digunakan untuk create data.
-<img src="Screenshots/post.png">
+<img src="screenshots/post.png">
 
 #### DELETE
 Metode Delete pada umumnya digunakan untuk menghapus data.
-<img src="Screenshots/delete.png">
+<img src="screenshots/delete.png">
