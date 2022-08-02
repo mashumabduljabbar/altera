@@ -1,3 +1,6 @@
+<details>
+  <summary>Click to expand prepare!</summary>
+  
 ### Database 
 ``` sql
 mysql> CREATE DATABASE `db_spring` /*!40100 COLLATE 'utf8mb4_general_ci' */;
@@ -204,6 +207,9 @@ public class Application {
 ```
 
 ### Run Application Spring Java lalu Buka Postman
+
+</details>
+
 
 ##### CREATE Users
 <img src="Screenshots/create.png">
