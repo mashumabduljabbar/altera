@@ -17,7 +17,7 @@ mysql> FLUSH PRIVILEGES;
 ### POM.XML
 JDK 1.8
 spring-boot-starter-parent 2.2.1.RELEASE
-Dependencies : Spring Web, Spring Security, Spring Data JPA, MySQL Driver, JJWT
+Dependencies : Spring Web, Spring Security, Spring Data JPA, MySQL Driver, JJWT, Lombok
 ``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -66,6 +66,11 @@ Dependencies : Spring Web, Spring Security, Spring Data JPA, MySQL Driver, JJWT
 			<scope>runtime</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -109,7 +114,7 @@ spring.datasource.initialization-mode=always
 spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL8Dialect
 
 # Hibernate ddl auto (create, create-drop, validate, update)
-spring.jpa.hibernate.ddl-auto = create-drop
+spring.jpa.hibernate.ddl-auto = update
 ```
 
 ## Model
@@ -617,20 +622,36 @@ public class JwtAuthenticationController {
 }
 ```
 
-### Create EmployeeController.java
+### Create UserController.java
 ``` java
 package com.mashumabduljabbar.jwt.controller;
+import java.util.HashMap;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+
 @RestController
-@CrossOrigin()
-public class EmployeeController {
-    @RequestMapping(value = "/greeting", method = RequestMethod.GET)
-    public String getEmployees() {
-        return "Welcome!";
-    }
+@RequestMapping(path="/v2/auth", produces="application/json")
+@CrossOrigin(origins="*")
+public class UserController {
+	@Value("${jwt.secret}")
+	private String secret;
+	
+	@GetMapping("/info")
+	public ResponseEntity<?> getInfo(@RequestHeader("Authorization") String bearerToken) throws Exception {
+		String bearer = bearerToken.replace("Bearer ", "");
+		Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(bearer).getBody();
+		HashMap<String,String> respon=new HashMap<String,String>();
+		respon.put("phone", claims.get("sub", String.class));
+		return ResponseEntity.ok(respon);
+	}
 }
 ```
 
@@ -651,24 +672,22 @@ public class JwtApplication {
 	}
 
 }
-
 ```
+
+### Register User
+<img src="Screenshots/register.png">
+
 </details>
 
 ## Soal Tugas
 
 ### Problem 1 - JWT Generation
 
-##### Auth User
+#### Auth User
 Login menggunakan Phone dan Password
 <img src="Screenshots/auth.png">
-<img src="Screenshots/auth2.png">
 
-##### GET User
-<img src="Screenshots/get.png">
+### Problem 2 - JWT Extraction
 
-##### UPDATE User
-<img src="Screenshots/update.png">
-
-##### DELETE User
-<img src="Screenshots/delete.png">
+#### GET Info
+<img src="Screenshots/info.png">
