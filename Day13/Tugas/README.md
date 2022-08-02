@@ -3,20 +3,6 @@
 mysql> CREATE DATABASE `db_spring` /*!40100 COLLATE 'utf8mb4_general_ci' */;
 USE `db_spring`;
 
-mysql> CREATE TABLE `users` (
-	`id` INT(11) NOT NULL AUTO_INCREMENT,
-	`first_name` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	`last_name` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	`phone` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	`password` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	PRIMARY KEY (`id`) USING BTREE
-)
-COLLATE='utf8mb4_general_ci'
-ENGINE=InnoDB
-AUTO_INCREMENT=3
-;
-
-
 mysql> CREATE USER 'alterra'@'localhost' IDENTIFIED BY 'spring2022';
 
 mysql> GRANT ALL PRIVILEGES ON db_spring . * TO 'alterra'@'localhost';
@@ -27,28 +13,17 @@ mysql> FLUSH PRIVILEGES;
 ## Spring
 ### Spring Boot : 
 1. Buka https://start.spring.io/
-2. Dependencies : Spring Web, Spring Data JPA, MySQL Driver, Spring Security, Lombok
+2. Dependencies : Spring Web, Spring Security, Spring Data JPA, MySQL Driver
 3. Unduh dan buka di IDE
+<img src="Screenshots/spring.png">
 
-### Tambahkan JJWT di POM.XLM
+### Tambahkan Dependency JJWT di POM.XML
 ``` xml
-<dependency>
-	<groupId>io.jsonwebtoken</groupId>
-	<artifactId>jjwt-api</artifactId>
-	<version>0.11.2</version>
-</dependency>
-<dependency>
-	<groupId>io.jsonwebtoken</groupId>
-	<artifactId>jjwt-impl</artifactId>
-	<version>0.11.2</version>
-	<scope>runtime</scope>
-</dependency>
-<dependency>
-	<groupId>io.jsonwebtoken</groupId>
-	<artifactId>jjwt-jackson</artifactId>
-	<version>0.11.2</version>
-	<scope>runtime</scope>
-</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
+		</dependency>
 ```
 
 ### Configure Data Source Properties
@@ -71,7 +46,7 @@ spring.jpa.hibernate.ddl-auto = create-drop
 ## Model
 ### Create UserDao.java
 ``` java
-package com.example.demo.model;
+package com.mashumabduljabbar.jwt.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -109,7 +84,7 @@ public class UserDao {
 
 ### Create UserDto.java
 ``` Java
-package com.example.demo.model;
+package com.mashumabduljabbar.jwt.model;
 
 public class UserDto {
     private String username;
@@ -135,7 +110,7 @@ public class UserDto {
 
 ### Create JwtRequest.java
 ``` Java
-package com.example.demo.model;
+package com.mashumabduljabbar.jwt.model;
 
 import java.io.Serializable;
 
@@ -176,7 +151,7 @@ public class JwtRequest implements Serializable {
 
 ### Create JwtResponse.java
 ``` Java
-package com.example.demo.model;
+package com.mashumabduljabbar.jwt.model;
 
 import java.io.Serializable;
 
@@ -199,10 +174,10 @@ public class JwtResponse implements Serializable {
 
 ### Create UserRepository.java
 ``` java
-package com.example.demo.repository;
-import com.example.demo.model.UserDao;
-
+package com.mashumabduljabbar.jwt.repository;
 import org.springframework.data.repository.CrudRepository;
+
+import com.mashumabduljabbar.jwt.model.UserDao;
 public interface UserRepository extends CrudRepository<UserDao, Integer> {
     UserDao findByUsername(String username);
 }
@@ -211,11 +186,12 @@ public interface UserRepository extends CrudRepository<UserDao, Integer> {
 ## Service
 ### Create JwtUserDetailsService.java
 ```java
-package com.example.demo.service;
+package com.mashumabduljabbar.jwt.service;
 
-import com.example.demo.model.UserDao;
-import com.example.demo.model.UserDto;
-import com.example.demo.repository.UserRepository;
+import com.mashumabduljabbar.jwt.model.UserDao;
+import com.mashumabduljabbar.jwt.model.UserDto;
+import com.mashumabduljabbar.jwt.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -255,41 +231,78 @@ public class JwtUserDetailsService implements UserDetailsService {
 ## Config
 ### Create WebSecurityConfig.java
 ``` java
-package com.example.demo.service;
+package com.mashumabduljabbar.jwt.config;
 
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.transaction.Transactional;
-import java.util.List;
-@Service
-@Transactional
-public class UserService {
-    @Autowired
-    private UserRepository userRepository;
-    public List<User> listAllUser() {
-        return userRepository.findAll();
-    }
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    public void saveUser(User user) {
-        userRepository.save(user);
-    }
+	@Autowired
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    public User getUser(Integer id) {
-        return userRepository.findById(id).get();
-    }
+	@Autowired
+	private UserDetailsService jwtUserDetailsService;
 
-    public void deleteUser(Integer id) {
-        userRepository.deleteById(id);
-    }
+	@Autowired
+	private JwtRequestFilter jwtRequestFilter;
+
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		// configure AuthenticationManager so that it knows from where to load
+		// user for matching credentials
+		// Use BCryptPasswordEncoder
+		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+
+	@Override
+	protected void configure(HttpSecurity httpSecurity) throws Exception {
+		// We don't need CSRF for this example
+		httpSecurity.csrf().disable()
+				// dont authenticate this particular request
+				.authorizeRequests().antMatchers("/authenticate", "/register").permitAll().
+				// all other requests need to be authenticated
+						anyRequest().authenticated().and().
+				// make sure we use stateless session; session won't be used to
+				// store user's state.
+						exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+		// Add a filter to validate the tokens with every request
+		httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+	}
 }
 ```
 
 ### Create JwtTokenUtil.java
 ``` java
-package com.example.demo.config;
+package com.mashumabduljabbar.jwt.config;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -332,7 +345,6 @@ public class JwtTokenUtil implements Serializable {
 		return claimsResolver.apply(claims);
 	}
 
-	@SuppressWarnings("deprecation")
 	private Claims getAllClaimsFromToken(String token) {
 		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 	}
@@ -352,7 +364,6 @@ public class JwtTokenUtil implements Serializable {
 		return doGenerateToken(claims, userDetails.getUsername());
 	}
 
-	@SuppressWarnings("deprecation")
 	private String doGenerateToken(Map<String, Object> claims, String subject) {
 
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
@@ -368,12 +379,11 @@ public class JwtTokenUtil implements Serializable {
 		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	}
 }
-
 ```
 
 ### Create JwtRequestFilter.java
 ``` java
-package com.example.demo.config;
+package com.mashumabduljabbar.jwt.config;
 
 import java.io.IOException;
 
@@ -390,7 +400,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.demo.service.JwtUserDetailsService;
+import com.mashumabduljabbar.jwt.service.JwtUserDetailsService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
@@ -450,7 +460,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 ### Create JwtAuthenticationEntryPoint.java
 ``` java
-package com.example.demo.config;
+package com.mashumabduljabbar.jwt.config;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -479,13 +489,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Se
 ## Controller
 ### Create JwtAuthenticationController.java
 ``` java
-package com.example.demo.controller;
+package com.mashumabduljabbar.jwt.controller;
 
-import com.example.demo.config.JwtTokenUtil;
-import com.example.demo.model.JwtRequest;
-import com.example.demo.model.JwtResponse;
-import com.example.demo.model.UserDto;
-import com.example.demo.service.JwtUserDetailsService;
+import com.mashumabduljabbar.jwt.config.JwtTokenUtil;
+import com.mashumabduljabbar.jwt.model.JwtRequest;
+import com.mashumabduljabbar.jwt.model.JwtResponse;
+import com.mashumabduljabbar.jwt.model.UserDto;
+import com.mashumabduljabbar.jwt.service.JwtUserDetailsService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -537,22 +548,41 @@ public class JwtAuthenticationController {
 }
 ```
 
-## Spring Boot Application
-### Create DemoApplication.java
+### Create EmployeeController.java
 ``` java
-package com.example.demo;
+package com.mashumabduljabbar.jwt.controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+@RestController
+@CrossOrigin()
+public class EmployeeController {
+    @RequestMapping(value = "/greeting", method = RequestMethod.GET)
+    public String getEmployees() {
+        return "Welcome!";
+    }
+}
+```
+
+
+## Spring Boot Application
+### JwtApplication.java
+``` java
+package com.mashumabduljabbar.jwt;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DemoApplication {
+public class JwtApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(JwtApplication.class, args);
 	}
 
 }
+
 ```
 
 ### Run Application Spring Java lalu Buka Postman
