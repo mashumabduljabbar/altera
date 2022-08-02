@@ -1,3 +1,6 @@
+<details>
+  <summary>Click to expand prepare!</summary>
+  
 ## Database 
 ``` sql
 mysql> CREATE DATABASE `db_spring` /*!40100 COLLATE 'utf8mb4_general_ci' */;
@@ -10,30 +13,96 @@ mysql> GRANT ALL PRIVILEGES ON db_spring . * TO 'alterra'@'localhost';
 mysql> FLUSH PRIVILEGES;
 ```
 
-## Spring
-### Spring Boot : 
-1. Buka https://start.spring.io/
-2. Dependencies : Spring Web, Spring Security, Spring Data JPA, MySQL Driver
-3. Unduh dan buka di IDE
-<img src="Screenshots/spring.png">
-
-### Tambahkan Dependency JJWT di POM.XML
+## Maven
+### POM.XML
+JDK 1.8
+spring-boot-starter-parent 2.2.1.RELEASE
+Dependencies : Spring Web, Spring Security, Spring Data JPA, MySQL Driver, JJWT
 ``` xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.2.1.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.mashumabduljabbar</groupId>
+	<artifactId>jwt</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>jwt</name>
+	<description>Demo project for Spring Boot</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
 ```
+
 
 ### Configure Data Source Properties
 ``` properties
-spring.main.allow-circular-references=true
+jwt.secret=mashumabduljabbar2022
 
 ## Spring DATASOURCE (DataSourceAutoConfiguration & DataSourceProperties)
-spring.datasource.url = jdbc:mysql://localhost:3306/db_spring?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
-spring.datasource.username = alterra
-spring.datasource.password = spring2022
+spring.datasource.url=jdbc:mysql://localhost:3306/db_spring?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+spring.datasource.username=alterra
+spring.datasource.password=spring2022
+spring.datasource.platform=mysql
+spring.datasource.initialization-mode=always
 
 ## Hibernate Properties
 # The SQL dialect makes Hibernate generate better SQL for the chosen database
@@ -58,17 +127,17 @@ public class UserDao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column
-    private String username;
+    private String phone;
     @Column
     @JsonIgnore
     private String password;
 
-    public String getUsername() {
-        return username;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getPassword() {
@@ -87,16 +156,8 @@ public class UserDao {
 package com.mashumabduljabbar.jwt.model;
 
 public class UserDto {
-    private String username;
+    private String phone;
     private String password;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     public String getPassword() {
         return password;
@@ -105,6 +166,14 @@ public class UserDto {
     public void setPassword(String password) {
         this.password = password;
     }
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 }
 ```
 
@@ -118,7 +187,7 @@ public class JwtRequest implements Serializable {
 
 	private static final long serialVersionUID = 5926468583005150707L;
 	
-	private String username;
+	private String phone;
 	private String password;
 	
 	//default constructor for JSON Parsing
@@ -126,17 +195,17 @@ public class JwtRequest implements Serializable {
 	{
 	}
 
-	public JwtRequest(String username, String password) {
-		this.setUsername(username);
+	public JwtRequest(String phone, String password) {
+		this.setPhone(phone);
 		this.setPassword(password);
 	}
 
-	public String getUsername() {
-		return this.username;
+	public String getPhone() {
+		return this.phone;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	public String getPassword() {
@@ -179,7 +248,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.mashumabduljabbar.jwt.model.UserDao;
 public interface UserRepository extends CrudRepository<UserDao, Integer> {
-    UserDao findByUsername(String username);
+    UserDao findByPhone(String phone);
 }
 ```
 
@@ -210,18 +279,18 @@ public class JwtUserDetailsService implements UserDetailsService {
 	private PasswordEncoder bcryptEncoder;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserDao user = userDao.findByUsername(username);
+	public UserDetails loadUserByUsername(String phone) throws UsernameNotFoundException {
+		UserDao user = userDao.findByPhone(phone);
 		if (user == null) {
-			throw new UsernameNotFoundException("User not found with username: " + username);
+			throw new UsernameNotFoundException("User not found with username: " + phone);
 		}
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+		return new org.springframework.security.core.userdetails.User(user.getPhone(), user.getPassword(),
 				new ArrayList<>());
 	}
 
 	public UserDao save(UserDto user) {
 		UserDao newUser = new UserDao();
-		newUser.setUsername(user.getUsername());
+		newUser.setPhone(user.getPhone());
 		newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
 		return userDao.save(newUser);
 	}
@@ -286,7 +355,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// We don't need CSRF for this example
 		httpSecurity.csrf().disable()
 				// dont authenticate this particular request
-				.authorizeRequests().antMatchers("/authenticate", "/register").permitAll().
+				.authorizeRequests().antMatchers("/v2/auth/login", "/register").permitAll().
 				// all other requests need to be authenticated
 						anyRequest().authenticated().and().
 				// make sure we use stateless session; session won't be used to
@@ -375,8 +444,8 @@ public class JwtTokenUtil implements Serializable {
 	}
 
 	public Boolean validateToken(String token, UserDetails userDetails) {
-		final String username = getUsernameFromToken(token);
-		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+		final String phone = getUsernameFromToken(token);
+		return (phone.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	}
 }
 ```
@@ -419,13 +488,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		final String requestTokenHeader = request.getHeader("Authorization");
 
-		String username = null;
+		String phone = null;
 		String jwtToken = null;
 		// JWT Token is in the form "Bearer token". Remove Bearer word and get only the Token
 		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
 			jwtToken = requestTokenHeader.substring(7);
 			try {
-				username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+				phone = jwtTokenUtil.getUsernameFromToken(jwtToken);
 			} catch (IllegalArgumentException e) {
 				System.out.println("Unable to get JWT Token");
 			} catch (ExpiredJwtException e) {
@@ -436,9 +505,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		}
 
 		//Once we get the token validate it.
-		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+		if (phone != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-			UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+			UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(phone);
 
 			// if token is valid configure Spring Security to manually set authentication
 			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
@@ -519,12 +588,12 @@ public class JwtAuthenticationController {
 	@Autowired
 	private JwtUserDetailsService userDetailsService;
 
-	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+	@RequestMapping(value = "/v2/auth/login", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
-		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+		authenticate(authenticationRequest.getPhone(), authenticationRequest.getPassword());
 
-		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getPhone());
 
 		final String token = jwtTokenUtil.generateToken(userDetails);
 
@@ -536,9 +605,9 @@ public class JwtAuthenticationController {
 		return ResponseEntity.ok(userDetailsService.save(user));
 	}
 
-	private void authenticate(String username, String password) throws Exception {
+	private void authenticate(String phone, String password) throws Exception {
 		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(phone, password));
 		} catch (DisabledException e) {
 			throw new Exception("USER_DISABLED", e);
 		} catch (BadCredentialsException e) {
@@ -584,14 +653,16 @@ public class JwtApplication {
 }
 
 ```
+</details>
 
-### Run Application Spring Java lalu Buka Postman
+## Soal Tugas
 
-##### CREATE Users
-<img src="Screenshots/create.png">
+### Problem 1 - JWT Generation
 
-##### READ Users
-<img src="Screenshots/read.png">
+##### Auth User
+Login menggunakan Phone dan Password
+<img src="Screenshots/auth.png">
+<img src="Screenshots/auth2.png">
 
 ##### GET User
 <img src="Screenshots/get.png">

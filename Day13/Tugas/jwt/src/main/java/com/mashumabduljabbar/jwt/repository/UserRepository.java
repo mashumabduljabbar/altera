@@ -3,5 +3,5 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.mashumabduljabbar.jwt.model.UserDao;
 public interface UserRepository extends CrudRepository<UserDao, Integer> {
-    UserDao findByUsername(String username);
+    UserDao findByPhone(String phone);
 }

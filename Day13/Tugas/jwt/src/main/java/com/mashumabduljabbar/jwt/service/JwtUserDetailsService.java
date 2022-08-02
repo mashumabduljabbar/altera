@@ -22,18 +22,18 @@ public class JwtUserDetailsService implements UserDetailsService {
 	private PasswordEncoder bcryptEncoder;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserDao user = userDao.findByUsername(username);
+	public UserDetails loadUserByUsername(String phone) throws UsernameNotFoundException {
+		UserDao user = userDao.findByPhone(phone);
 		if (user == null) {
-			throw new UsernameNotFoundException("User not found with username: " + username);
+			throw new UsernameNotFoundException("User not found with username: " + phone);
 		}
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+		return new org.springframework.security.core.userdetails.User(user.getPhone(), user.getPassword(),
 				new ArrayList<>());
 	}
 
 	public UserDao save(UserDto user) {
 		UserDao newUser = new UserDao();
-		newUser.setUsername(user.getUsername());
+		newUser.setPhone(user.getPhone());
 		newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
 		return userDao.save(newUser);
 	}
