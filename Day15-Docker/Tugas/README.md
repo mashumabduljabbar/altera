@@ -76,6 +76,8 @@ docker push mashumabduljabbar/gs-spring-boot-docker:latest
 docker run -p 8080:8080 -t mashumabduljabbar/gs-spring-boot-docker
 ```
 
+<img src="Screenshots/Run.png">
+
 #### 7. Try DockerCompose to run go app + mysql (opt.)
 ``` docker
 
