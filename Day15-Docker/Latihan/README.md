@@ -12,7 +12,7 @@ docker run -p 8080:8080 image_name
 ```
 
 docker login
-docker build - t image_name:tag
+docker build -t jwt_demo:1.0
 docker run -p 8080:8080 image_name
 docker images
 docker image ls
