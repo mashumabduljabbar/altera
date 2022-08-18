@@ -1,0 +1,17 @@
+server:
+  port: 7171
+spring:
+  profiles:
+    active: native
+  application:
+    name: SPRING-GATEWAY
+  devtools:
+    livereload:
+      enabled: true
+  cloud:
+    gateway:
+      routes:
+      - id: STUDENT
+        uri: lb://STUDENT
+        predicates:
+          - Path=/api/v1/**
