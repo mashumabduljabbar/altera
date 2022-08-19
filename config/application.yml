@@ -5,5 +5,5 @@ eureka:
     service-url:
       defaultZone: http://15.207.72.135:8761/eureka/
   instance:
-    prefer-ip-address: true
-    ip-address: 15.207.72.135
+    preferIpAddress: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
