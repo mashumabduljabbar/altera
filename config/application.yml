@@ -6,3 +6,4 @@ eureka:
       defaultZone: http://15.207.72.135:8761/eureka/
   instance:
     hostname: 15.207.72.135
+eureka.instance.preferIpAddress: true
