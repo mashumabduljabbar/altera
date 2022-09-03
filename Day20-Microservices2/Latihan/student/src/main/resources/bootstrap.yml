@@ -4,4 +4,4 @@ spring:
   cloud:
     config:
       enabled: true
-      uri: http://localhost:9269
+      uri: http://15.207.72.135:9269
